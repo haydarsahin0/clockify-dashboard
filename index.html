@@ -52,33 +52,18 @@
     margin: 0 auto;
     padding: 56px 24px 80px;
   }
-  .hero {
-    text-align: center;
-    margin-bottom: 40px;
-  }
+  .hero { text-align: center; margin-bottom: 40px; }
   .hero .eyebrow {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--accent);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-bottom: 10px;
+    font-size: 13px; font-weight: 600; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px;
   }
   .hero h1 {
-    font-size: clamp(32px, 5vw, 48px);
-    font-weight: 700;
-    margin: 0 0 10px;
+    font-size: clamp(32px, 5vw, 48px); font-weight: 700; margin: 0 0 10px;
     letter-spacing: -0.02em;
     background: linear-gradient(180deg, var(--text-1), var(--text-2));
-    -webkit-background-clip: text;
-    background-clip: text;
+    -webkit-background-clip: text; background-clip: text;
   }
-  .hero p {
-    font-size: 17px;
-    color: var(--text-2);
-    margin: 0;
-    font-weight: 400;
-  }
+  .hero p { font-size: 17px; color: var(--text-2); margin: 0; font-weight: 400; }
 
   .glass {
     background: var(--card-bg);
@@ -90,15 +75,8 @@
     transition: transform 0.35s cubic-bezier(.2,.8,.2,1), box-shadow 0.35s;
   }
 
-  .setup {
-    padding: 28px 32px;
-    margin-bottom: 28px;
-  }
-  .setup h2 {
-    margin: 0 0 4px;
-    font-size: 19px;
-    font-weight: 600;
-  }
+  .setup { padding: 28px 32px; margin-bottom: 28px; }
+  .setup h2 { margin: 0 0 4px; font-size: 19px; font-weight: 600; }
   .setup .hint { color: var(--text-3); font-size: 13px; margin: 0 0 18px; }
   .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
   input {
@@ -133,13 +111,10 @@
   }
   button:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,113,227,0.35); }
   button:active { transform: translateY(0); }
-  button.secondary {
-    background: rgba(120,120,128,0.12);
-    color: var(--text-1);
-    box-shadow: none;
-  }
+  button.secondary { background: rgba(120,120,128,0.12); color: var(--text-1); box-shadow: none; }
   button.secondary:hover { background: rgba(120,120,128,0.2); box-shadow: none; }
   button.spinning { opacity: 0.6; cursor: default; pointer-events: none; }
+  button.small { padding: 8px 14px; font-size: 13px; }
   button .icon { display: inline-block; transition: transform 0.5s ease; }
   button.spinning .icon { animation: spin 0.8s linear infinite; }
   @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -148,14 +123,8 @@
   .status.ok { color: #30d158; }
   .status.warn { color: #ff9f0a; }
   .debug {
-    font-size: 12px;
-    color: var(--text-3);
-    margin-top: 10px;
-    padding: 10px 12px;
-    background: rgba(120,120,128,0.08);
-    border-radius: 10px;
-    white-space: pre-wrap;
-    display: none;
+    font-size: 12px; color: var(--text-3); margin-top: 10px; padding: 10px 12px;
+    background: rgba(120,120,128,0.08); border-radius: 10px; white-space: pre-wrap; display: none;
   }
   .debug.show { display: block; }
 
@@ -165,116 +134,77 @@
     gap: 16px;
     margin-bottom: 28px;
   }
-  .card {
-    padding: 22px 24px;
-  }
+  .card { padding: 22px 24px; }
   .card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
   .card .label {
-    color: var(--text-3);
-    font-size: 12.5px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    margin-bottom: 8px;
+    color: var(--text-3); font-size: 12.5px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px;
   }
-  .card .value {
-    font-size: 30px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    color: var(--text-1);
-  }
+  .card .value { font-size: 30px; font-weight: 700; letter-spacing: -0.02em; color: var(--text-1); }
   .card .value .unit { font-size: 15px; font-weight: 500; color: var(--text-3); margin-left: 4px; }
 
-  .chart-card {
-    padding: 28px 32px 24px;
-    margin-bottom: 28px;
-  }
-  .chart-card h2 {
-    margin: 0 0 2px;
-    font-size: 19px;
-    font-weight: 600;
-  }
+  .chart-card { padding: 28px 32px 24px; margin-bottom: 28px; }
+  .chart-card h2 { margin: 0 0 2px; font-size: 19px; font-weight: 600; }
   .chart-card .sub { color: var(--text-3); font-size: 13px; margin: 0 0 20px; }
   .chart-wrap { position: relative; height: 400px; }
   .chart-wrap.short { height: 320px; }
 
-  .legend-pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 18px;
-  }
+  .legend-pills { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
   .pill {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 7px 14px;
-    border-radius: 999px;
-    background: rgba(120,120,128,0.08);
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-2);
+    display: flex; align-items: center; gap: 8px; padding: 7px 14px;
+    border-radius: 999px; background: rgba(120,120,128,0.08);
+    font-size: 13px; font-weight: 500; color: var(--text-2);
   }
   .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
   .dot.dash {
-    width: 14px;
-    height: 0;
-    border-radius: 0;
-    border-top: 2px dashed currentColor;
-    background: none;
+    width: 14px; height: 0; border-radius: 0;
+    border-top: 2px dashed currentColor; background: none;
   }
 
   .cat-list { list-style: none; padding: 0; margin: 4px 0 0; }
   .cat-list li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 0;
-    border-bottom: 1px solid var(--card-border);
-    font-size: 15px;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 0; border-bottom: 1px solid var(--card-border); font-size: 15px;
   }
   .cat-list li:last-child { border-bottom: none; }
   .cat-name { display: flex; align-items: center; gap: 10px; font-weight: 500; }
   .cat-value { font-weight: 600; color: var(--text-1); }
 
-  .goals-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 14px;
-    margin-top: 4px;
-  }
-  .goal-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 12px 14px;
-    border-radius: 12px;
+  .exam-list { display: flex; flex-direction: column; gap: 14px; }
+  .exam-item {
+    padding: 18px 20px;
+    border-radius: 16px;
     background: rgba(120,120,128,0.08);
   }
-  .goal-item .goal-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    font-weight: 500;
+  .exam-item .exam-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; margin-bottom: 12px; flex-wrap: wrap;
   }
-  .goal-item input {
-    width: 70px;
-    flex: none;
-    padding: 8px 10px;
-    text-align: right;
-    font-size: 14px;
+  .exam-item .exam-title {
+    display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600;
   }
-  .goal-item .goal-unit { font-size: 12px; color: var(--text-3); }
+  .exam-item .exam-fields {
+    display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+  }
+  .exam-item .field-group { display: flex; flex-direction: column; gap: 4px; }
+  .exam-item .field-group label { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.03em; }
+  .exam-item input { min-width: 140px; padding: 9px 12px; font-size: 14px; }
+  .exam-item input[type="number"] { min-width: 90px; text-align: right; }
+  .exam-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--card-border);
+  }
+  .exam-stat { text-align: left; }
+  .exam-stat .exam-stat-label { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 3px; }
+  .exam-stat .exam-stat-value { font-size: 17px; font-weight: 700; }
+  .exam-stat .exam-stat-value.behind { color: #ff453a; }
+  .exam-stat .exam-stat-value.ontrack { color: #30d158; }
 
-  .footer {
-    color: var(--text-3);
-    font-size: 13px;
-    text-align: center;
-    margin-top: 40px;
-    line-height: 1.6;
-  }
+  .footer { color: var(--text-3); font-size: 13px; text-align: center; margin-top: 40px; line-height: 1.6; }
   .footer a { color: var(--accent); text-decoration: none; }
   .footer a:hover { text-decoration: underline; }
 
@@ -292,7 +222,7 @@
   <div class="hero">
     <div class="eyebrow">Live Tracking</div>
     <h1>Clockify Dashboard</h1>
-    <p>Kategoriye göre çalışma saatleri, hedeflerin ve hareketli ortalamaların üzerine bindirilmiş halde.</p>
+    <p>Kategoriye göre çalışma saatleri, sınav hedeflerine göre gereken günlük çalışma temposu ile birlikte.</p>
   </div>
 
   <div class="glass setup" id="setupCard">
@@ -313,16 +243,16 @@
   </div>
 
   <div class="glass setup" id="goalsCard">
-    <h2>Günlük Hedefler</h2>
-    <p class="hint">Her kategori için günlük hedef çalışma sürenizi (saat) belirleyin. Ana grafikte kesikli çizgi olarak gösterilir.</p>
-    <div class="goals-grid" id="goalsGrid"></div>
+    <h2>Sınav Hedefleri</h2>
+    <p class="hint">Her kategori için sınav tarihini ve o tarihe kadar toplamda çalışmanız gereken saati girin. Kalan gün sayısına göre günlük gereken tempo otomatik hesaplanır ve ana grafikte kesikli çizgi olarak gösterilir.</p>
+    <div class="exam-list" id="examList"></div>
   </div>
 
   <div class="grid" id="summaryCards"></div>
 
   <div class="glass chart-card">
     <h2>Günlük Çalışma &middot; Kategori Bazlı</h2>
-    <p class="sub">Son 30 gün, kategoriye göre renklendirilmiş günlük çalışma süresi, hedef çizgileri ile 7g / 30g ortalama</p>
+    <p class="sub">Son 30 gün, kategoriye göre renklendirilmiş günlük çalışma süresi, sınava kadar gereken günlük tempo (kesikli) ile 7g / 30g ortalama</p>
     <div class="chart-wrap"><canvas id="mainChart"></canvas></div>
     <div class="legend-pills" id="legendPills"></div>
   </div>
@@ -353,12 +283,13 @@ const MA7_COLOR = "#ff375f";
 const MA30_COLOR = "#1d1d1f";
 const BACKGROUND_REFRESH_MS = 5 * 60 * 1000;
 const STALE_THRESHOLD_MS = 60 * 1000;
-const GOALS_STORAGE_KEY = "clockify_daily_goals";
+const EXAMS_STORAGE_KEY = "clockify_exam_goals";
 let mainChart = null;
 let categoryChart = null;
 let refreshTimer = null;
 let lastLoadedAt = 0;
 let lastDailyLabels = null;
+let lastCategoryTotals = null;
 
 function isDarkMode() {
   return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -375,45 +306,116 @@ function getSettings() {
   };
 }
 
-function getGoals() {
+function getExams() {
   try {
-    const raw = localStorage.getItem(GOALS_STORAGE_KEY);
+    const raw = localStorage.getItem(EXAMS_STORAGE_KEY);
     const parsed = raw ? JSON.parse(raw) : {};
-    const goals = {};
-    CATEGORIES.forEach(c => { goals[c] = typeof parsed[c] === "number" ? parsed[c] : 0; });
-    return goals;
+    const exams = {};
+    CATEGORIES.forEach(c => {
+      exams[c] = {
+        date: parsed[c] && parsed[c].date ? parsed[c].date : "",
+        totalHours: parsed[c] && typeof parsed[c].totalHours === "number" ? parsed[c].totalHours : 0
+      };
+    });
+    return exams;
   } catch (e) {
-    return CATEGORIES.reduce((acc, c) => (acc[c] = 0, acc), {});
+    const exams = {};
+    CATEGORIES.forEach(c => exams[c] = { date: "", totalHours: 0 });
+    return exams;
   }
 }
 
-function saveGoal(category, value) {
-  const goals = getGoals();
-  goals[category] = value;
-  localStorage.setItem(GOALS_STORAGE_KEY, JSON.stringify(goals));
+function saveExam(category, date, totalHours) {
+  const exams = getExams();
+  exams[category] = { date, totalHours };
+  localStorage.setItem(EXAMS_STORAGE_KEY, JSON.stringify(exams));
 }
 
-function renderGoalsInputs() {
-  const goals = getGoals();
-  const container = document.getElementById("goalsGrid");
-  container.innerHTML = CATEGORIES.map(cat => `
-    <div class="goal-item">
-      <span class="goal-label"><span class="dot" style="background:${CATEGORY_COLORS[cat]}"></span>${cat}</span>
-      <span style="display:flex; align-items:center; gap:6px;">
-        <input type="number" min="0" step="0.25" value="${goals[cat] || ""}" placeholder="0"
-               data-category="${cat}" onchange="onGoalChange(event)" />
-        <span class="goal-unit">sa/gün</span>
-      </span>
+function daysUntil(dateStr) {
+  if (!dateStr) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const target = new Date(dateStr + "T00:00:00");
+  const diffMs = target - today;
+  return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+}
+
+function renderExamInputs() {
+  const exams = getExams();
+  const container = document.getElementById("examList");
+  container.innerHTML = CATEGORIES.map(cat => {
+    const exam = exams[cat];
+    return `
+    <div class="exam-item">
+      <div class="exam-head">
+        <span class="exam-title"><span class="dot" style="background:${CATEGORY_COLORS[cat]}"></span>${cat}</span>
+        <div class="exam-fields">
+          <div class="field-group">
+            <label>Sınav Tarihi</label>
+            <input type="date" data-category="${cat}" data-field="date" value="${exam.date}" onchange="onExamChange(event)" />
+          </div>
+          <div class="field-group">
+            <label>Toplam Gerekli Saat</label>
+            <input type="number" min="0" step="0.5" placeholder="0" data-category="${cat}" data-field="totalHours"
+                   value="${exam.totalHours || ""}" onchange="onExamChange(event)" />
+          </div>
+        </div>
+      </div>
+      <div class="exam-stats" id="examStats-${cat}"></div>
     </div>
-  `).join("");
+    `;
+  }).join("");
+  renderExamStats();
 }
 
-function onGoalChange(evt) {
+function renderExamStats() {
+  const exams = getExams();
+  const totals = lastCategoryTotals || {};
+  CATEGORIES.forEach(cat => {
+    const exam = exams[cat];
+    const el = document.getElementById("examStats-" + cat);
+    if (!el) return;
+    if (!exam.date || !exam.totalHours) {
+      el.innerHTML = `<div class="exam-stat"><div class="exam-stat-label">Durum</div><div class="exam-stat-value">Tarih ve saat girin</div></div>`;
+      return;
+    }
+    const remainingDays = daysUntil(exam.date);
+    const doneHours = totals[cat] || 0;
+    const remainingHours = Math.max(0, exam.totalHours - doneHours);
+    let dailyNeeded = null;
+    if (remainingDays !== null && remainingDays > 0) {
+      dailyNeeded = remainingHours / remainingDays;
+    }
+    const statusClass = remainingDays !== null && remainingDays <= 3 && remainingHours > 0 ? "behind" : "ontrack";
+
+    let stats = [
+      { label: "Kalan Gün", value: remainingDays === null ? "-" : (remainingDays < 0 ? "Geçti" : remainingDays), cls: "" },
+      { label: "Toplam Hedef", value: exam.totalHours.toFixed(1) + " sa", cls: "" },
+      { label: "Şimdiye Kadar", value: doneHours.toFixed(1) + " sa", cls: "" },
+      { label: "Kalan Saat", value: remainingHours.toFixed(1) + " sa", cls: "" },
+      { label: "Günlük Gereken", value: dailyNeeded === null ? "-" : dailyNeeded.toFixed(2) + " sa/gün", cls: statusClass }
+    ];
+
+    el.innerHTML = stats.map(s =>
+      `<div class="exam-stat"><div class="exam-stat-label">${s.label}</div><div class="exam-stat-value ${s.cls}">${s.value}</div></div>`
+    ).join("");
+  });
+}
+
+function onExamChange(evt) {
   const cat = evt.target.getAttribute("data-category");
-  const value = parseFloat(evt.target.value);
-  saveGoal(cat, isNaN(value) || value < 0 ? 0 : value);
+  const field = evt.target.getAttribute("data-field");
+  const exams = getExams();
+  const current = exams[cat];
+  if (field === "date") {
+    saveExam(cat, evt.target.value, current.totalHours);
+  } else {
+    const value = parseFloat(evt.target.value);
+    saveExam(cat, current.date, isNaN(value) || value < 0 ? 0 : value);
+  }
+  renderExamStats();
   if (lastDailyLabels) {
-    loadDashboard(true);
+    renderMainChart(lastDailyLabels, lastTotalSeries, lastCategorySeriesMap);
   }
 }
 
@@ -425,11 +427,7 @@ function setStatus(msg, type) {
 
 function setDebug(msg) {
   const el = document.getElementById("debugBox");
-  if (!msg) {
-    el.classList.remove("show");
-    el.textContent = "";
-    return;
-  }
+  if (!msg) { el.classList.remove("show"); el.textContent = ""; return; }
   el.textContent = msg;
   el.classList.add("show");
 }
@@ -594,15 +592,19 @@ function renderSummaryCards(totalSeries, categoryTotals) {
 }
 
 function renderLegendPills() {
-  const goals = getGoals();
+  const exams = getExams();
   const items = [
     ...CATEGORIES.map(c => ({ label: c, color: CATEGORY_COLORS[c], dash: false })),
     { label: "7 Günlük Ortalama", color: MA7_COLOR, dash: false },
     { label: "30 Günlük Ortalama", color: ma30LineColor(), dash: false }
   ];
   CATEGORIES.forEach(c => {
-    if (goals[c] > 0) {
-      items.push({ label: c + " Hedefi (" + goals[c] + " sa)", color: CATEGORY_COLORS[c], dash: true });
+    const exam = exams[c];
+    if (exam.date && exam.totalHours > 0) {
+      const rd = daysUntil(exam.date);
+      if (rd !== null && rd > 0) {
+        items.push({ label: c + " Gereken Tempo", color: CATEGORY_COLORS[c], dash: true });
+      }
     }
   });
   document.getElementById("legendPills").innerHTML = items.map(i =>
@@ -610,11 +612,17 @@ function renderLegendPills() {
   ).join("");
 }
 
+let lastTotalSeries = null;
+let lastCategorySeriesMap = null;
+
 function renderMainChart(labels, totalSeries, categorySeriesMap) {
+  lastTotalSeries = totalSeries;
+  lastCategorySeriesMap = categorySeriesMap;
   const ctx = document.getElementById("mainChart");
   const ma7 = movingAverage(totalSeries, 7);
   const ma30 = movingAverage(totalSeries, 30);
-  const goals = getGoals();
+  const exams = getExams();
+  const totals = lastCategoryTotals || {};
 
   const categoryDatasets = CATEGORIES.map(cat => ({
     label: cat,
@@ -630,18 +638,30 @@ function renderMainChart(labels, totalSeries, categorySeriesMap) {
   }));
 
   const goalDatasets = CATEGORIES
-    .filter(cat => goals[cat] > 0)
-    .map(cat => ({
-      label: cat + " Hedefi",
-      data: labels.map(() => goals[cat]),
-      borderColor: CATEGORY_COLORS[cat],
-      borderWidth: 1.5,
-      borderDash: [4, 4],
-      fill: false,
-      pointRadius: 0,
-      tension: 0,
-      order: 5
-    }));
+    .filter(cat => {
+      const exam = exams[cat];
+      if (!exam.date || !exam.totalHours) return false;
+      const rd = daysUntil(exam.date);
+      return rd !== null && rd > 0;
+    })
+    .map(cat => {
+      const exam = exams[cat];
+      const rd = daysUntil(exam.date);
+      const doneHours = totals[cat] || 0;
+      const remainingHours = Math.max(0, exam.totalHours - doneHours);
+      const dailyNeeded = remainingHours / rd;
+      return {
+        label: cat + " Gereken Tempo",
+        data: labels.map(() => dailyNeeded),
+        borderColor: CATEGORY_COLORS[cat],
+        borderWidth: 1.5,
+        borderDash: [4, 4],
+        fill: false,
+        pointRadius: 0,
+        tension: 0,
+        order: 5
+      };
+    });
 
   const data = {
     labels,
@@ -804,10 +824,12 @@ async function loadDashboard(silent) {
       categorySeriesMap[cat] = buildCategoryDailySeries(entries, labels, cat);
     });
     const categoryTotals = buildCategoryTotals(entries);
+    lastCategoryTotals = categoryTotals;
 
     renderSummaryCards(totalSeries, categoryTotals);
     renderMainChart(labels, totalSeries, categorySeriesMap);
     renderCategoryChart(categoryTotals);
+    renderExamStats();
 
     lastLoadedAt = Date.now();
     const now2 = new Date();
@@ -817,7 +839,7 @@ async function loadDashboard(silent) {
         "Workspace: " + workspaceId + "\n" +
         "User ID: " + userId + "\n" +
         "Aralık: " + start30.toISOString() + " → " + endOfToday.toISOString() + "\n" +
-        "Clockify'da bu workspace + kullanıcı için bu aralıkta kayıt bulunamadı. Clockify uygulamasında zaman kaydının doğru workspace'te ve doğru hesapta olduğunu kontrol edin."
+        "Clockify'da bu workspace + kullanıcı için bu aralıkta kayıt bulunamadı."
       );
     } else {
       setStatus("Son güncelleme: " + now2.toLocaleTimeString("tr-TR") + " · " + entries.length + " kayıt yüklendi.", "ok");
@@ -870,7 +892,7 @@ document.addEventListener("visibilitychange", () => {
 });
 
 window.addEventListener("load", () => {
-  renderGoalsInputs();
+  renderExamInputs();
   const { apiKey, workspaceId } = getSettings();
   if (apiKey) {
     document.getElementById("apiKey").value = apiKey;
