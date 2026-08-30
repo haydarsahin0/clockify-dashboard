@@ -146,6 +146,18 @@
   .status { font-size: 13px; color: var(--text-3); margin-top: 4px; min-height: 18px; transition: color 0.2s; }
   .status.error { color: #ff453a; }
   .status.ok { color: #30d158; }
+  .status.warn { color: #ff9f0a; }
+  .debug {
+    font-size: 12px;
+    color: var(--text-3);
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: rgba(120,120,128,0.08);
+    border-radius: 10px;
+    white-space: pre-wrap;
+    display: none;
+  }
+  .debug.show { display: block; }
 
   .grid {
     display: grid;
@@ -259,6 +271,7 @@
       <span class="status" id="refreshInfo" style="margin-left:auto;"></span>
     </div>
     <div class="status" id="statusMsg"></div>
+    <div class="debug" id="debugBox"></div>
   </div>
 
   <div class="grid" id="summaryCards"></div>
@@ -322,12 +335,24 @@ function setStatus(msg, type) {
   el.className = "status" + (type ? " " + type : "");
 }
 
+function setDebug(msg) {
+  const el = document.getElementById("debugBox");
+  if (!msg) {
+    el.classList.remove("show");
+    el.textContent = "";
+    return;
+  }
+  el.textContent = msg;
+  el.classList.add("show");
+}
+
 function clearSettings() {
   localStorage.removeItem("clockify_api_key");
   localStorage.removeItem("clockify_workspace_id");
   document.getElementById("apiKey").value = "";
   document.getElementById("workspaceId").value = "";
   setStatus("Ayarlar temizlendi.", "");
+  setDebug(null);
   if (refreshTimer) clearInterval(refreshTimer);
 }
 
@@ -342,7 +367,7 @@ async function clockifyFetch(path, apiKey, params) {
   });
   if (!res.ok) {
     const text = await res.text();
-    throw new Error("Clockify API hata (" + res.status + "): " + text);
+    throw new Error("Clockify API hata (" + res.status + ") " + path + ": " + text);
   }
   return res.json();
 }
@@ -353,6 +378,14 @@ async function resolveWorkspaceId(apiKey) {
   return workspaces[0].id;
 }
 
+async function resolveUserId(apiKey, workspaceId) {
+  const me = await clockifyFetch("/user", apiKey);
+  if (me && me.id) return me.id;
+  const members = await clockifyFetch("/workspaces/" + workspaceId + "/users", apiKey);
+  if (members && members.length > 0) return members[0].id;
+  throw new Error("Kullanıcı ID'si bulunamadı.");
+}
+
 async function fetchAllTimeEntries(apiKey, workspaceId, userId, startISO, endISO) {
   let page = 1;
   const pageSize = 200;
@@ -361,7 +394,7 @@ async function fetchAllTimeEntries(apiKey, workspaceId, userId, startISO, endISO
     const entries = await clockifyFetch(
       "/workspaces/" + workspaceId + "/user/" + userId + "/time-entries",
       apiKey,
-      { start: startISO, end: endISO, "page-size": pageSize, page: page, hydrated: true }
+      { start: startISO, end: endISO, "page-size": String(pageSize), page: String(page), hydrated: "true" }
     );
     all = all.concat(entries);
     if (entries.length < pageSize) break;
@@ -639,16 +672,18 @@ async function loadDashboard(silent) {
     const workspaceId = storedWs || await resolveWorkspaceId(apiKey);
     if (!storedWs) localStorage.setItem("clockify_workspace_id", workspaceId);
 
-    const meRes = await clockifyFetch("/user", apiKey);
-    const userId = meRes.id;
+    const userId = await resolveUserId(apiKey, workspaceId);
 
     const now = new Date();
     const start30 = new Date(now);
     start30.setDate(start30.getDate() - 30);
+    start30.setHours(0, 0, 0, 0);
+    const endOfToday = new Date(now);
+    endOfToday.setHours(23, 59, 59, 999);
 
     const entries = await fetchAllTimeEntries(
       apiKey, workspaceId, userId,
-      start30.toISOString(), now.toISOString()
+      start30.toISOString(), endOfToday.toISOString()
     );
 
     const labels = buildDateLabels(30);
@@ -665,10 +700,22 @@ async function loadDashboard(silent) {
 
     lastLoadedAt = Date.now();
     const now2 = new Date();
-    setStatus("Son güncelleme: " + now2.toLocaleTimeString("tr-TR") + " · " + entries.length + " kayıt yüklendi.", "ok");
+    if (entries.length === 0) {
+      setStatus("Son güncelleme: " + now2.toLocaleTimeString("tr-TR") + " · 0 kayıt bulundu.", "warn");
+      setDebug(
+        "Workspace: " + workspaceId + "\n" +
+        "User ID: " + userId + "\n" +
+        "Aralık: " + start30.toISOString() + " → " + endOfToday.toISOString() + "\n" +
+        "Clockify'da bu workspace + kullanıcı için bu aralıkta kayıt bulunamadı. Clockify uygulamasında zaman kaydının doğru workspace'te ve doğru hesapta olduğunu kontrol edin."
+      );
+    } else {
+      setStatus("Son güncelleme: " + now2.toLocaleTimeString("tr-TR") + " · " + entries.length + " kayıt yüklendi.", "ok");
+      setDebug(null);
+    }
   } catch (err) {
     console.error(err);
     setStatus("Hata: " + err.message, "error");
+    setDebug(err.stack || String(err));
   }
 }
 
