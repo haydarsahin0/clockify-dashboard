@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clockify Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1115;
+    --card: #171a21;
+    --border: #262b36;
+    --text: #e6e8ec;
+    --muted: #9aa1ad;
+    --accent: #5b8cff;
+    --accent2: #ff7a5b;
+    --green: #3ddc97;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px;
+  }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .subtitle { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+  .setup {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+  }
+  .setup h2 { margin-top: 0; font-size: 16px; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+  input {
+    background: #0f1115;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    flex: 1;
+    min-width: 220px;
+  }
+  button {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  button:hover { opacity: 0.9; }
+  button.secondary { background: #2a2f3a; }
+  .status { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .status.error { color: #ff6b6b; }
+  .status.ok { color: var(--green); }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+  }
+  .card .label { color: var(--muted); font-size: 13px; margin-bottom: 6px; }
+  .card .value { font-size: 24px; font-weight: 700; }
+  .card .value.small { font-size: 18px; }
+  .chart-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+  }
+  .chart-card h2 { margin-top: 0; font-size: 16px; }
+  .chart-wrap { position: relative; height: 380px; }
+  .cat-list { list-style: none; padding: 0; margin: 0; }
+  .cat-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .cat-list li:last-child { border-bottom: none; }
+  .cat-name { display: flex; align-items: center; gap: 8px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .footer { color: var(--muted); font-size: 12px; text-align: center; margin-top: 30px; }
+  .refresh-info { font-size: 12px; color: var(--muted); }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<h1>Clockify Dashboard</h1>
+<div class="subtitle">Kategori bazlı çalışma saatleri &middot; 7 ve 30 günlük hareketli ortalama</div>
+
+<div class="setup" id="setupCard">
+  <h2>Bağlantı Ayarları</h2>
+  <div class="row">
+    <input id="apiKey" type="password" placeholder="Clockify API Key" />
+    <input id="workspaceId" type="text" placeholder="Workspace ID (opsiyonel - otomatik bulunur)" />
+  </div>
+  <div class="row">
+    <button onclick="saveAndLoad()">Kaydet ve Yükle</button>
+    <button class="secondary" onclick="clearSettings()">Ayarları Temizle</button>
+    <span class="refresh-info" id="refreshInfo"></span>
+  </div>
+  <div class="status" id="statusMsg"></div>
+</div>
+
+<div class="grid" id="summaryCards"></div>
+
+<div class="chart-card">
+  <h2>Günlük Çalışma Süresi (7g ve 30g Ortalama)</h2>
+  <div class="chart-wrap"><canvas id="mainChart"></canvas></div>
+</div>
+
+<div class="chart-card">
+  <h2>Kategoriye Göre Toplam Çalışma Saatleri (Son 30 Gün)</h2>
+  <div class="chart-wrap" style="height:320px;"><canvas id="categoryChart"></canvas></div>
+  <ul class="cat-list" id="categoryList"></ul>
+</div>
+
+<div class="footer">
+  Kategoriler: Recht &middot; Makroökonomie &middot; Statistik &middot; Deutsch lernen<br>
+  Veriler Clockify API üzerinden doğrudan tarayıcınızda çekilir, hiçbir sunucuya gönderilmez.
+</div>
+
+<script>
+const CATEGORIES = ["Recht", "Makroökonomie", "Statistik", "Deutsch lernen"];
+const CATEGORY_COLORS = {
+  "Recht": "#5b8cff",
+  "Makroökonomie": "#ff7a5b",
+  "Statistik": "#3ddc97",
+  "Deutsch lernen": "#f4c542"
+};
+const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
+let mainChart = null;
+let categoryChart = null;
+let refreshTimer = null;
+
+function getSettings() {
+  return {
+    apiKey: localStorage.getItem("clockify_api_key") || "",
+    workspaceId: localStorage.getItem("clockify_workspace_id") || ""
+  };
+}
+
+function setStatus(msg, type) {
+  const el = document.getElementById("statusMsg");
+  el.textContent = msg;
+  el.className = "status" + (type ? " " + type : "");
+}
+
+function clearSettings() {
+  localStorage.removeItem("clockify_api_key");
+  localStorage.removeItem("clockify_workspace_id");
+  document.getElementById("apiKey").value = "";
+  document.getElementById("workspaceId").value = "";
+  setStatus("Ayarlar temizlendi.", "");
+  if (refreshTimer) clearInterval(refreshTimer);
+}
+
+async function clockifyFetch(path, apiKey, params) {
+  let url = "https://api.clockify.me/api/v1" + path;
+  if (params) {
+    const qs = new URLSearchParams(params).toString();
+    url += (url.includes("?") ? "&" : "?") + qs;
+  }
+  const res = await fetch(url, {
+    headers: { "X-Api-Key": apiKey, "Content-Type": "application/json" }
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error("Clockify API hata (" + res.status + "): " + text);
+  }
+  return res.json();
+}
+
+async function resolveWorkspaceId(apiKey) {
+  const workspaces = await clockifyFetch("/workspaces", apiKey);
+  if (!workspaces || workspaces.length === 0) throw new Error("Workspace bulunamadı.");
+  return workspaces[0].id;
+}
+
+async function fetchAllTimeEntries(apiKey, workspaceId, userId, startISO, endISO) {
+  let page = 1;
+  const pageSize = 200;
+  let all = [];
+  while (true) {
+    const entries = await clockifyFetch(
+      "/workspaces/" + workspaceId + "/user/" + userId + "/time-entries",
+      apiKey,
+      { start: startISO, end: endISO, "page-size": pageSize, page: page, hydrated: true }
+    );
+    all = all.concat(entries);
+    if (entries.length < pageSize) break;
+    page += 1;
+    if (page > 20) break;
+  }
+  return all;
+}
+
+function durationToHours(entry) {
+  const interval = entry.timeInterval;
+  if (!interval || !interval.start) return 0;
+  const start = new Date(interval.start);
+  const end = interval.end ? new Date(interval.end) : new Date();
+  return Math.max(0, (end - start) / (1000 * 60 * 60));
+}
+
+function dateKey(d) {
+  return d.toISOString().slice(0, 10);
+}
+
+function matchCategory(entry) {
+  const projectName = entry.project && entry.project.name ? entry.project.name : "";
+  const tagNames = (entry.tags || []).map(t => t.name);
+  for (const cat of CATEGORIES) {
+    if (projectName === cat) return cat;
+    if (tagNames.includes(cat)) return cat;
+  }
+  return null;
+}
+
+function movingAverage(arr, windowSize) {
+  const result = [];
+  for (let i = 0; i < arr.length; i++) {
+    const startIdx = Math.max(0, i - windowSize + 1);
+    const slice = arr.slice(startIdx, i + 1);
+    const sum = slice.reduce((a, b) => a + b, 0);
+    result.push(sum / slice.length);
+  }
+  return result;
+}
+
+function buildDailySeries(entries, days) {
+  const now = new Date();
+  const dayBuckets = {};
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    dayBuckets[dateKey(d)] = 0;
+  }
+  entries.forEach(entry => {
+    const interval = entry.timeInterval;
+    if (!interval || !interval.start) return;
+    const start = new Date(interval.start);
+    const key = dateKey(start);
+    if (key in dayBuckets) {
+      dayBuckets[key] += durationToHours(entry);
+    }
+  });
+  const labels = Object.keys(dayBuckets);
+  const values = labels.map(k => Math.round(dayBuckets[k] * 100) / 100);
+  return { labels, values };
+}
+
+function buildCategoryTotals(entries) {
+  const totals = {};
+  CATEGORIES.forEach(c => totals[c] = 0);
+  totals["Diğer"] = 0;
+  entries.forEach(entry => {
+    const cat = matchCategory(entry) || "Diğer";
+    totals[cat] = (totals[cat] || 0) + durationToHours(entry);
+  });
+  Object.keys(totals).forEach(k => totals[k] = Math.round(totals[k] * 100) / 100);
+  return totals;
+}
+
+function renderSummaryCards(dailySeries30, categoryTotals) {
+  const totalHours30 = dailySeries30.values.reduce((a, b) => a + b, 0);
+  const avg30 = totalHours30 / dailySeries30.values.length;
+  const last7 = dailySeries30.values.slice(-7);
+  const avg7 = last7.reduce((a, b) => a + b, 0) / last7.length;
+  const totalCategoryHours = Object.entries(categoryTotals)
+    .filter(([k]) => k !== "Diğer")
+    .reduce((a, [, v]) => a + v, 0);
+
+  const cards = [
+    { label: "Son 30 Gün Toplam", value: totalHours30.toFixed(1) + " sa" },
+    { label: "30 Günlük Ortalama / Gün", value: avg30.toFixed(2) + " sa" },
+    { label: "7 Günlük Ortalama / Gün", value: avg7.toFixed(2) + " sa" },
+    { label: "Kategorili Toplam Saat", value: totalCategoryHours.toFixed(1) + " sa" }
+  ];
+
+  const container = document.getElementById("summaryCards");
+  container.innerHTML = cards.map(c =>
+    `<div class="card"><div class="label">${c.label}</div><div class="value">${c.value}</div></div>`
+  ).join("");
+}
+
+function renderMainChart(dailySeries30) {
+  const ctx = document.getElementById("mainChart");
+  const ma7 = movingAverage(dailySeries30.values, 7);
+  const ma30 = movingAverage(dailySeries30.values, 30);
+
+  const data = {
+    labels: dailySeries30.labels,
+    datasets: [
+      {
+        label: "Günlük Çalışma (saat)",
+        data: dailySeries30.values,
+        borderColor: "#5b8cff55",
+        backgroundColor: "#5b8cff22",
+        fill: true,
+        tension: 0.3,
+        pointRadius: 2,
+        order: 3
+      },
+      {
+        label: "7 Günlük Ortalama",
+        data: ma7,
+        borderColor: "#ff7a5b",
+        borderWidth: 2.5,
+        fill: false,
+        tension: 0.35,
+        pointRadius: 0,
+        order: 1
+      },
+      {
+        label: "30 Günlük Ortalama",
+        data: ma30,
+        borderColor: "#3ddc97",
+        borderWidth: 2.5,
+        fill: false,
+        tension: 0.35,
+        pointRadius: 0,
+        order: 2
+      }
+    ]
+  };
+
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: "index", intersect: false },
+    scales: {
+      x: {
+        type: "time",
+        time: { unit: "day" },
+        ticks: { color: "#9aa1ad" },
+        grid: { color: "#262b36" }
+      },
+      y: {
+        title: { display: true, text: "Saat", color: "#9aa1ad" },
+        ticks: { color: "#9aa1ad" },
+        grid: { color: "#262b36" },
+        beginAtZero: true
+      }
+    },
+    plugins: {
+      legend: { labels: { color: "#e6e8ec" } },
+      tooltip: { mode: "index", intersect: false }
+    }
+  };
+
+  if (mainChart) mainChart.destroy();
+  mainChart = new Chart(ctx, { type: "line", data, options });
+}
+
+function renderCategoryChart(categoryTotals) {
+  const ctx = document.getElementById("categoryChart");
+  const labels = Object.keys(categoryTotals).filter(k => categoryTotals[k] > 0 || CATEGORIES.includes(k));
+  const values = labels.map(k => categoryTotals[k]);
+  const colors = labels.map(k => CATEGORY_COLORS[k] || "#6b7280");
+
+  const data = {
+    labels,
+    datasets: [{
+      label: "Saat",
+      data: values,
+      backgroundColor: colors,
+      borderRadius: 6
+    }]
+  };
+
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    indexAxis: "y",
+    scales: {
+      x: {
+        ticks: { color: "#9aa1ad" },
+        grid: { color: "#262b36" },
+        beginAtZero: true,
+        title: { display: true, text: "Saat", color: "#9aa1ad" }
+      },
+      y: { ticks: { color: "#e6e8ec" }, grid: { display: false } }
+    },
+    plugins: { legend: { display: false } }
+  };
+
+  if (categoryChart) categoryChart.destroy();
+  categoryChart = new Chart(ctx, { type: "bar", data, options });
+
+  const listEl = document.getElementById("categoryList");
+  listEl.innerHTML = labels.map(l =>
+    `<li><span class="cat-name"><span class="dot" style="background:${CATEGORY_COLORS[l] || "#6b7280"}"></span>${l}</span><span>${categoryTotals[l].toFixed(1)} sa</span></li>`
+  ).join("");
+}
+
+async function loadDashboard(silent) {
+  const { apiKey, workspaceId: storedWs } = getSettings();
+  if (!apiKey) {
+    setStatus("Lütfen Clockify API Key girin.", "error");
+    return;
+  }
+  if (!silent) setStatus("Yükleniyor...", "");
+  try {
+    const workspaceId = storedWs || await resolveWorkspaceId(apiKey);
+    if (!storedWs) localStorage.setItem("clockify_workspace_id", workspaceId);
+
+    const meRes = await clockifyFetch("/user", apiKey);
+    const userId = meRes.id;
+
+    const now = new Date();
+    const start30 = new Date(now);
+    start30.setDate(start30.getDate() - 30);
+
+    const entries = await fetchAllTimeEntries(
+      apiKey, workspaceId, userId,
+      start30.toISOString(), now.toISOString()
+    );
+
+    const dailySeries30 = buildDailySeries(entries, 30);
+    const categoryTotals = buildCategoryTotals(entries);
+
+    renderSummaryCards(dailySeries30, categoryTotals);
+    renderMainChart(dailySeries30);
+    renderCategoryChart(categoryTotals);
+
+    const now2 = new Date();
+    setStatus("Son güncelleme: " + now2.toLocaleTimeString("tr-TR") + " · " + entries.length + " kayıt yüklendi.", "ok");
+  } catch (err) {
+    console.error(err);
+    setStatus("Hata: " + err.message, "error");
+  }
+}
+
+function saveAndLoad() {
+  const apiKey = document.getElementById("apiKey").value.trim();
+  const workspaceId = document.getElementById("workspaceId").value.trim();
+  if (!apiKey) {
+    setStatus("API Key gerekli.", "error");
+    return;
+  }
+  localStorage.setItem("clockify_api_key", apiKey);
+  if (workspaceId) localStorage.setItem("clockify_workspace_id", workspaceId);
+  else localStorage.removeItem("clockify_workspace_id");
+  startAutoRefresh();
+  loadDashboard(false);
+}
+
+function startAutoRefresh() {
+  if (refreshTimer) clearInterval(refreshTimer);
+  refreshTimer = setInterval(() => loadDashboard(true), REFRESH_INTERVAL_MS);
+  document.getElementById("refreshInfo").textContent =
+    "Otomatik yenileme: her " + (REFRESH_INTERVAL_MS / 60000) + " dakikada bir";
+}
+
+window.addEventListener("load", () => {
+  const { apiKey, workspaceId } = getSettings();
+  if (apiKey) {
+    document.getElementById("apiKey").value = apiKey;
+    document.getElementById("workspaceId").value = workspaceId;
+    startAutoRefresh();
+    loadDashboard(false);
+  }
+});
+</script>
+</body>
+</html>
