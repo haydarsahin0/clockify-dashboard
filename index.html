@@ -8,148 +8,299 @@
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 <style>
   :root {
-    --bg: #0f1115;
-    --card: #171a21;
-    --border: #262b36;
-    --text: #e6e8ec;
-    --muted: #9aa1ad;
-    --accent: #5b8cff;
-    --accent2: #ff7a5b;
-    --green: #3ddc97;
+    --bg-0: #f5f5f7;
+    --bg-1: #ffffff;
+    --card-bg: rgba(255, 255, 255, 0.72);
+    --card-border: rgba(0, 0, 0, 0.06);
+    --text-1: #1d1d1f;
+    --text-2: #6e6e73;
+    --text-3: #86868b;
+    --accent: #0071e3;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04), 0 1px 1px rgba(0,0,0,0.03);
+    --shadow-md: 0 8px 30px rgba(0,0,0,0.06);
+    --shadow-lg: 0 20px 60px rgba(0,0,0,0.08);
+    --radius: 20px;
   }
-  * { box-sizing: border-box; }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-0: #000000;
+      --bg-1: #0a0a0c;
+      --card-bg: rgba(28, 28, 30, 0.72);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-1: #f5f5f7;
+      --text-2: #a1a1a6;
+      --text-3: #86868b;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+      --shadow-md: 0 8px 30px rgba(0,0,0,0.4);
+      --shadow-lg: 0 20px 60px rgba(0,0,0,0.5);
+    }
+  }
+  * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+  html { scroll-behavior: smooth; }
   body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    padding: 24px;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Roboto, sans-serif;
+    background: radial-gradient(circle at 20% 0%, rgba(0,113,227,0.08), transparent 40%),
+                radial-gradient(circle at 90% 10%, rgba(255,122,91,0.06), transparent 40%),
+                var(--bg-0);
+    color: var(--text-1);
+    min-height: 100vh;
+    letter-spacing: -0.01em;
   }
-  h1 { font-size: 22px; margin: 0 0 4px; }
-  .subtitle { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 56px 24px 80px;
+  }
+  .hero {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .hero .eyebrow {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+  .hero h1 {
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 700;
+    margin: 0 0 10px;
+    letter-spacing: -0.02em;
+    background: linear-gradient(180deg, var(--text-1), var(--text-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  .hero p {
+    font-size: 17px;
+    color: var(--text-2);
+    margin: 0;
+    font-weight: 400;
+  }
+
+  .glass {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    box-shadow: var(--shadow-md);
+    transition: transform 0.35s cubic-bezier(.2,.8,.2,1), box-shadow 0.35s;
+  }
+
   .setup {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 24px;
+    padding: 28px 32px;
+    margin-bottom: 28px;
   }
-  .setup h2 { margin-top: 0; font-size: 16px; }
-  .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+  .setup h2 {
+    margin: 0 0 4px;
+    font-size: 19px;
+    font-weight: 600;
+  }
+  .setup .hint { color: var(--text-3); font-size: 13px; margin: 0 0 18px; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
   input {
-    background: #0f1115;
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 10px 12px;
-    border-radius: 8px;
-    font-size: 14px;
+    background: rgba(120,120,128,0.08);
+    border: 1px solid var(--card-border);
+    color: var(--text-1);
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 15px;
     flex: 1;
     min-width: 220px;
+    font-family: inherit;
+    transition: box-shadow 0.2s, border-color 0.2s;
+  }
+  input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(0,113,227,0.12);
   }
   button {
     background: var(--accent);
     color: white;
     border: none;
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-size: 14px;
+    padding: 12px 22px;
+    border-radius: 12px;
+    font-size: 15px;
     cursor: pointer;
     font-weight: 600;
+    font-family: inherit;
+    transition: transform 0.15s, opacity 0.15s, box-shadow 0.15s;
+    box-shadow: 0 2px 8px rgba(0,113,227,0.3);
   }
-  button:hover { opacity: 0.9; }
-  button.secondary { background: #2a2f3a; }
-  .status { font-size: 13px; color: var(--muted); margin-top: 6px; }
-  .status.error { color: #ff6b6b; }
-  .status.ok { color: var(--green); }
+  button:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,113,227,0.35); }
+  button:active { transform: translateY(0); }
+  button.secondary {
+    background: rgba(120,120,128,0.12);
+    color: var(--text-1);
+    box-shadow: none;
+  }
+  button.secondary:hover { background: rgba(120,120,128,0.2); box-shadow: none; }
+  .status { font-size: 13px; color: var(--text-3); margin-top: 4px; min-height: 18px; transition: color 0.2s; }
+  .status.error { color: #ff453a; }
+  .status.ok { color: #30d158; }
+
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 16px;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
   }
   .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 18px;
+    padding: 22px 24px;
   }
-  .card .label { color: var(--muted); font-size: 13px; margin-bottom: 6px; }
-  .card .value { font-size: 24px; font-weight: 700; }
-  .card .value.small { font-size: 18px; }
+  .card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+  .card .label {
+    color: var(--text-3);
+    font-size: 12.5px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 8px;
+  }
+  .card .value {
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-1);
+  }
+  .card .value .unit { font-size: 15px; font-weight: 500; color: var(--text-3); margin-left: 4px; }
+
   .chart-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 24px;
+    padding: 28px 32px 24px;
+    margin-bottom: 28px;
   }
-  .chart-card h2 { margin-top: 0; font-size: 16px; }
-  .chart-wrap { position: relative; height: 380px; }
-  .cat-list { list-style: none; padding: 0; margin: 0; }
+  .chart-card h2 {
+    margin: 0 0 2px;
+    font-size: 19px;
+    font-weight: 600;
+  }
+  .chart-card .sub { color: var(--text-3); font-size: 13px; margin: 0 0 20px; }
+  .chart-wrap { position: relative; height: 400px; }
+  .chart-wrap.short { height: 320px; }
+
+  .legend-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    background: rgba(120,120,128,0.08);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-2);
+  }
+  .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+
+  .cat-list { list-style: none; padding: 0; margin: 4px 0 0; }
   .cat-list li {
     display: flex;
     justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 14px;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--card-border);
+    font-size: 15px;
   }
   .cat-list li:last-child { border-bottom: none; }
-  .cat-name { display: flex; align-items: center; gap: 8px; }
-  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-  .footer { color: var(--muted); font-size: 12px; text-align: center; margin-top: 30px; }
-  .refresh-info { font-size: 12px; color: var(--muted); }
-  a { color: var(--accent); }
+  .cat-name { display: flex; align-items: center; gap: 10px; font-weight: 500; }
+  .cat-value { font-weight: 600; color: var(--text-1); }
+
+  .footer {
+    color: var(--text-3);
+    font-size: 13px;
+    text-align: center;
+    margin-top: 40px;
+    line-height: 1.6;
+  }
+  .footer a { color: var(--accent); text-decoration: none; }
+  .footer a:hover { text-decoration: underline; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .glass, .grid { animation: fadeUp 0.5s cubic-bezier(.2,.8,.2,1) both; }
 </style>
 </head>
 <body>
 
-<h1>Clockify Dashboard</h1>
-<div class="subtitle">Kategori bazlı çalışma saatleri &middot; 7 ve 30 günlük hareketli ortalama</div>
+<div class="wrap">
 
-<div class="setup" id="setupCard">
-  <h2>Bağlantı Ayarları</h2>
-  <div class="row">
-    <input id="apiKey" type="password" placeholder="Clockify API Key" />
-    <input id="workspaceId" type="text" placeholder="Workspace ID (opsiyonel - otomatik bulunur)" />
+  <div class="hero">
+    <div class="eyebrow">Live Tracking</div>
+    <h1>Clockify Dashboard</h1>
+    <p>Kategoriye göre çalışma saatleri, 7 ve 30 günlük hareketli ortalamalarla birlikte.</p>
   </div>
-  <div class="row">
-    <button onclick="saveAndLoad()">Kaydet ve Yükle</button>
-    <button class="secondary" onclick="clearSettings()">Ayarları Temizle</button>
-    <span class="refresh-info" id="refreshInfo"></span>
+
+  <div class="glass setup" id="setupCard">
+    <h2>Bağlantı</h2>
+    <p class="hint">API anahtarınız yalnızca bu tarayıcıda saklanır, hiçbir sunucuya gönderilmez.</p>
+    <div class="row">
+      <input id="apiKey" type="password" placeholder="Clockify API Key" />
+      <input id="workspaceId" type="text" placeholder="Workspace ID (opsiyonel)" />
+    </div>
+    <div class="row">
+      <button onclick="saveAndLoad()">Kaydet ve Yükle</button>
+      <button class="secondary" onclick="clearSettings()">Temizle</button>
+      <span class="status" id="refreshInfo" style="margin-left:auto;"></span>
+    </div>
+    <div class="status" id="statusMsg"></div>
   </div>
-  <div class="status" id="statusMsg"></div>
-</div>
 
-<div class="grid" id="summaryCards"></div>
+  <div class="grid" id="summaryCards"></div>
 
-<div class="chart-card">
-  <h2>Günlük Çalışma Süresi (7g ve 30g Ortalama)</h2>
-  <div class="chart-wrap"><canvas id="mainChart"></canvas></div>
-</div>
+  <div class="glass chart-card">
+    <h2>Günlük Çalışma &middot; Kategori Bazlı</h2>
+    <p class="sub">Son 30 gün, kategoriye göre renklendirilmiş günlük çalışma süresi ile 7g / 30g ortalama çizgileri</p>
+    <div class="chart-wrap"><canvas id="mainChart"></canvas></div>
+    <div class="legend-pills" id="legendPills"></div>
+  </div>
 
-<div class="chart-card">
-  <h2>Kategoriye Göre Toplam Çalışma Saatleri (Son 30 Gün)</h2>
-  <div class="chart-wrap" style="height:320px;"><canvas id="categoryChart"></canvas></div>
-  <ul class="cat-list" id="categoryList"></ul>
-</div>
+  <div class="glass chart-card">
+    <h2>Kategori Toplamları</h2>
+    <p class="sub">Son 30 günün kategori bazlı toplam çalışma saatleri</p>
+    <div class="chart-wrap short"><canvas id="categoryChart"></canvas></div>
+    <ul class="cat-list" id="categoryList"></ul>
+  </div>
 
-<div class="footer">
-  Kategoriler: Recht &middot; Makroökonomie &middot; Statistik &middot; Deutsch lernen<br>
-  Veriler Clockify API üzerinden doğrudan tarayıcınızda çekilir, hiçbir sunucuya gönderilmez.
+  <div class="footer">
+    Kategoriler: Recht &middot; Makroökonomie &middot; Statistik &middot; Deutsch lernen<br>
+    Veriler doğrudan tarayıcınızdan <a href="https://clockify.me" target="_blank">Clockify API</a>'sine bağlanılarak çekilir.
+  </div>
+
 </div>
 
 <script>
 const CATEGORIES = ["Recht", "Makroökonomie", "Statistik", "Deutsch lernen"];
 const CATEGORY_COLORS = {
-  "Recht": "#5b8cff",
-  "Makroökonomie": "#ff7a5b",
-  "Statistik": "#3ddc97",
-  "Deutsch lernen": "#f4c542"
+  "Recht": "#0071e3",
+  "Makroökonomie": "#34c759",
+  "Statistik": "#ff9f0a",
+  "Deutsch lernen": "#af52de"
 };
+const MA7_COLOR = "#ff375f";
+const MA30_COLOR = "#1d1d1f";
 const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
 let mainChart = null;
 let categoryChart = null;
 let refreshTimer = null;
+
+function isDarkMode() {
+  return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
+function axisColor() { return isDarkMode() ? "#a1a1a6" : "#6e6e73"; }
+function gridColor() { return isDarkMode() ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"; }
+function legendColor() { return isDarkMode() ? "#f5f5f7" : "#1d1d1f"; }
+function ma30LineColor() { return isDarkMode() ? "#f5f5f7" : "#1d1d1f"; }
 
 function getSettings() {
   return {
@@ -221,9 +372,7 @@ function durationToHours(entry) {
   return Math.max(0, (end - start) / (1000 * 60 * 60));
 }
 
-function dateKey(d) {
-  return d.toISOString().slice(0, 10);
-}
+function dateKey(d) { return d.toISOString().slice(0, 10); }
 
 function matchCategory(entry) {
   const projectName = entry.project && entry.project.name ? entry.project.name : "";
@@ -246,26 +395,40 @@ function movingAverage(arr, windowSize) {
   return result;
 }
 
-function buildDailySeries(entries, days) {
+function buildDateLabels(days) {
   const now = new Date();
-  const dayBuckets = {};
+  const labels = [];
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date(now);
     d.setDate(d.getDate() - i);
-    dayBuckets[dateKey(d)] = 0;
+    labels.push(dateKey(d));
   }
+  return labels;
+}
+
+function buildTotalDailySeries(entries, labels) {
+  const buckets = {};
+  labels.forEach(l => buckets[l] = 0);
   entries.forEach(entry => {
     const interval = entry.timeInterval;
     if (!interval || !interval.start) return;
-    const start = new Date(interval.start);
-    const key = dateKey(start);
-    if (key in dayBuckets) {
-      dayBuckets[key] += durationToHours(entry);
-    }
+    const key = dateKey(new Date(interval.start));
+    if (key in buckets) buckets[key] += durationToHours(entry);
   });
-  const labels = Object.keys(dayBuckets);
-  const values = labels.map(k => Math.round(dayBuckets[k] * 100) / 100);
-  return { labels, values };
+  return labels.map(k => Math.round(buckets[k] * 100) / 100);
+}
+
+function buildCategoryDailySeries(entries, labels, category) {
+  const buckets = {};
+  labels.forEach(l => buckets[l] = 0);
+  entries.forEach(entry => {
+    const interval = entry.timeInterval;
+    if (!interval || !interval.start) return;
+    if (matchCategory(entry) !== category) return;
+    const key = dateKey(new Date(interval.start));
+    if (key in buckets) buckets[key] += durationToHours(entry);
+  });
+  return labels.map(k => Math.round(buckets[k] * 100) / 100);
 }
 
 function buildCategoryTotals(entries) {
@@ -280,63 +443,80 @@ function buildCategoryTotals(entries) {
   return totals;
 }
 
-function renderSummaryCards(dailySeries30, categoryTotals) {
-  const totalHours30 = dailySeries30.values.reduce((a, b) => a + b, 0);
-  const avg30 = totalHours30 / dailySeries30.values.length;
-  const last7 = dailySeries30.values.slice(-7);
+function renderSummaryCards(totalSeries, categoryTotals) {
+  const totalHours30 = totalSeries.reduce((a, b) => a + b, 0);
+  const avg30 = totalHours30 / totalSeries.length;
+  const last7 = totalSeries.slice(-7);
   const avg7 = last7.reduce((a, b) => a + b, 0) / last7.length;
   const totalCategoryHours = Object.entries(categoryTotals)
     .filter(([k]) => k !== "Diğer")
     .reduce((a, [, v]) => a + v, 0);
 
   const cards = [
-    { label: "Son 30 Gün Toplam", value: totalHours30.toFixed(1) + " sa" },
-    { label: "30 Günlük Ortalama / Gün", value: avg30.toFixed(2) + " sa" },
-    { label: "7 Günlük Ortalama / Gün", value: avg7.toFixed(2) + " sa" },
-    { label: "Kategorili Toplam Saat", value: totalCategoryHours.toFixed(1) + " sa" }
+    { label: "Son 30 Gün Toplam", value: totalHours30.toFixed(1), unit: "saat" },
+    { label: "30 Günlük Ortalama", value: avg30.toFixed(2), unit: "saat/gün" },
+    { label: "7 Günlük Ortalama", value: avg7.toFixed(2), unit: "saat/gün" },
+    { label: "Kategorili Toplam", value: totalCategoryHours.toFixed(1), unit: "saat" }
   ];
 
   const container = document.getElementById("summaryCards");
   container.innerHTML = cards.map(c =>
-    `<div class="card"><div class="label">${c.label}</div><div class="value">${c.value}</div></div>`
+    `<div class="glass card"><div class="label">${c.label}</div><div class="value">${c.value}<span class="unit">${c.unit}</span></div></div>`
   ).join("");
 }
 
-function renderMainChart(dailySeries30) {
+function renderLegendPills() {
+  const items = [
+    ...CATEGORIES.map(c => ({ label: c, color: CATEGORY_COLORS[c] })),
+    { label: "7 Günlük Ortalama", color: MA7_COLOR },
+    { label: "30 Günlük Ortalama", color: ma30LineColor() }
+  ];
+  document.getElementById("legendPills").innerHTML = items.map(i =>
+    `<span class="pill"><span class="dot" style="background:${i.color}"></span>${i.label}</span>`
+  ).join("");
+}
+
+function renderMainChart(labels, totalSeries, categorySeriesMap) {
   const ctx = document.getElementById("mainChart");
-  const ma7 = movingAverage(dailySeries30.values, 7);
-  const ma30 = movingAverage(dailySeries30.values, 30);
+  const ma7 = movingAverage(totalSeries, 7);
+  const ma30 = movingAverage(totalSeries, 30);
+
+  const categoryDatasets = CATEGORIES.map(cat => ({
+    label: cat,
+    data: categorySeriesMap[cat],
+    borderColor: CATEGORY_COLORS[cat],
+    backgroundColor: CATEGORY_COLORS[cat] + "22",
+    fill: false,
+    tension: 0.35,
+    borderWidth: 2,
+    pointRadius: 0,
+    pointHoverRadius: 4,
+    order: 4
+  }));
 
   const data = {
-    labels: dailySeries30.labels,
+    labels,
     datasets: [
-      {
-        label: "Günlük Çalışma (saat)",
-        data: dailySeries30.values,
-        borderColor: "#5b8cff55",
-        backgroundColor: "#5b8cff22",
-        fill: true,
-        tension: 0.3,
-        pointRadius: 2,
-        order: 3
-      },
+      ...categoryDatasets,
       {
         label: "7 Günlük Ortalama",
         data: ma7,
-        borderColor: "#ff7a5b",
-        borderWidth: 2.5,
+        borderColor: MA7_COLOR,
+        borderWidth: 3,
+        borderDash: [],
         fill: false,
-        tension: 0.35,
+        tension: 0.4,
         pointRadius: 0,
         order: 1
       },
       {
         label: "30 Günlük Ortalama",
         data: ma30,
-        borderColor: "#3ddc97",
-        borderWidth: 2.5,
+        borderColor: ma30LineColor(),
+        borderWidth: 3,
+        borderDash: [6, 4],
         fill: false,
-        tension: 0.35,
+        tension: 0.4,
         pointRadius: 0,
         order: 2
       }
@@ -351,31 +531,45 @@ function renderMainChart(dailySeries30) {
       x: {
         type: "time",
         time: { unit: "day" },
-        ticks: { color: "#9aa1ad" },
-        grid: { color: "#262b36" }
+        ticks: { color: axisColor(), font: { family: "-apple-system, sans-serif" } },
+        grid: { color: gridColor(), drawTicks: false },
+        border: { display: false }
       },
       y: {
-        title: { display: true, text: "Saat", color: "#9aa1ad" },
-        ticks: { color: "#9aa1ad" },
-        grid: { color: "#262b36" },
+        title: { display: true, text: "Saat", color: axisColor(), font: { size: 12, family: "-apple-system, sans-serif" } },
+        ticks: { color: axisColor() },
+        grid: { color: gridColor(), drawTicks: false },
+        border: { display: false },
         beginAtZero: true
       }
     },
     plugins: {
-      legend: { labels: { color: "#e6e8ec" } },
-      tooltip: { mode: "index", intersect: false }
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: isDarkMode() ? "rgba(28,28,30,0.9)" : "rgba(255,255,255,0.95)",
+        titleColor: isDarkMode() ? "#f5f5f7" : "#1d1d1f",
+        bodyColor: isDarkMode() ? "#f5f5f7" : "#1d1d1f",
+        borderColor: gridColor(),
+        borderWidth: 1,
+        padding: 12,
+        cornerRadius: 10,
+        boxPadding: 4,
+        mode: "index",
+        intersect: false
+      }
     }
   };
 
   if (mainChart) mainChart.destroy();
   mainChart = new Chart(ctx, { type: "line", data, options });
+  renderLegendPills();
 }
 
 function renderCategoryChart(categoryTotals) {
   const ctx = document.getElementById("categoryChart");
   const labels = Object.keys(categoryTotals).filter(k => categoryTotals[k] > 0 || CATEGORIES.includes(k));
   const values = labels.map(k => categoryTotals[k]);
-  const colors = labels.map(k => CATEGORY_COLORS[k] || "#6b7280");
+  const colors = labels.map(k => CATEGORY_COLORS[k] || "#8e8e93");
 
   const data = {
     labels,
@@ -383,7 +577,8 @@ function renderCategoryChart(categoryTotals) {
       label: "Saat",
       data: values,
       backgroundColor: colors,
-      borderRadius: 6
+      borderRadius: 10,
+      barThickness: 28
     }]
   };
 
@@ -393,14 +588,28 @@ function renderCategoryChart(categoryTotals) {
     indexAxis: "y",
     scales: {
       x: {
-        ticks: { color: "#9aa1ad" },
-        grid: { color: "#262b36" },
+        ticks: { color: axisColor() },
+        grid: { color: gridColor(), drawTicks: false },
+        border: { display: false },
         beginAtZero: true,
-        title: { display: true, text: "Saat", color: "#9aa1ad" }
+        title: { display: true, text: "Saat", color: axisColor() }
       },
-      y: { ticks: { color: "#e6e8ec" }, grid: { display: false } }
+      y: {
+        ticks: { color: legendColor(), font: { weight: "500" } },
+        grid: { display: false },
+        border: { display: false }
+      }
     },
-    plugins: { legend: { display: false } }
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: isDarkMode() ? "rgba(28,28,30,0.9)" : "rgba(255,255,255,0.95)",
+        titleColor: isDarkMode() ? "#f5f5f7" : "#1d1d1f",
+        bodyColor: isDarkMode() ? "#f5f5f7" : "#1d1d1f",
+        cornerRadius: 10,
+        padding: 12
+      }
+    }
   };
 
   if (categoryChart) categoryChart.destroy();
@@ -408,7 +617,7 @@ function renderCategoryChart(categoryTotals) {
 
   const listEl = document.getElementById("categoryList");
   listEl.innerHTML = labels.map(l =>
-    `<li><span class="cat-name"><span class="dot" style="background:${CATEGORY_COLORS[l] || "#6b7280"}"></span>${l}</span><span>${categoryTotals[l].toFixed(1)} sa</span></li>`
+    `<li><span class="cat-name"><span class="dot" style="background:${CATEGORY_COLORS[l] || "#8e8e93"}"></span>${l}</span><span class="cat-value">${categoryTotals[l].toFixed(1)} sa</span></li>`
   ).join("");
 }
 
@@ -435,11 +644,16 @@ async function loadDashboard(silent) {
       start30.toISOString(), now.toISOString()
     );
 
-    const dailySeries30 = buildDailySeries(entries, 30);
+    const labels = buildDateLabels(30);
+    const totalSeries = buildTotalDailySeries(entries, labels);
+    const categorySeriesMap = {};
+    CATEGORIES.forEach(cat => {
+      categorySeriesMap[cat] = buildCategoryDailySeries(entries, labels, cat);
+    });
     const categoryTotals = buildCategoryTotals(entries);
 
-    renderSummaryCards(dailySeries30, categoryTotals);
-    renderMainChart(dailySeries30);
+    renderSummaryCards(totalSeries, categoryTotals);
+    renderMainChart(labels, totalSeries, categorySeriesMap);
     renderCategoryChart(categoryTotals);
 
     const now2 = new Date();
@@ -468,7 +682,7 @@ function startAutoRefresh() {
   if (refreshTimer) clearInterval(refreshTimer);
   refreshTimer = setInterval(() => loadDashboard(true), REFRESH_INTERVAL_MS);
   document.getElementById("refreshInfo").textContent =
-    "Otomatik yenileme: her " + (REFRESH_INTERVAL_MS / 60000) + " dakikada bir";
+    "Otomatik yenileme: " + (REFRESH_INTERVAL_MS / 60000) + " dk";
 }
 
 window.addEventListener("load", () => {
@@ -480,6 +694,13 @@ window.addEventListener("load", () => {
     loadDashboard(false);
   }
 });
+
+if (window.matchMedia) {
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+    const { apiKey } = getSettings();
+    if (apiKey) loadDashboard(true);
+  });
+}
 </script>
 </body>
 </html>
