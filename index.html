@@ -139,6 +139,10 @@
     box-shadow: none;
   }
   button.secondary:hover { background: rgba(120,120,128,0.2); box-shadow: none; }
+  button.spinning { opacity: 0.6; cursor: default; pointer-events: none; }
+  button .icon { display: inline-block; transition: transform 0.5s ease; }
+  button.spinning .icon { animation: spin 0.8s linear infinite; }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
   .status { font-size: 13px; color: var(--text-3); margin-top: 4px; min-height: 18px; transition: color 0.2s; }
   .status.error { color: #ff453a; }
   .status.ok { color: #30d158; }
@@ -250,6 +254,7 @@
     </div>
     <div class="row">
       <button onclick="saveAndLoad()">Kaydet ve Yükle</button>
+      <button class="secondary" id="refreshBtn" onclick="manualRefresh()"><span class="icon">↻</span> Yenile</button>
       <button class="secondary" onclick="clearSettings()">Temizle</button>
       <span class="status" id="refreshInfo" style="margin-left:auto;"></span>
     </div>
@@ -274,7 +279,7 @@
 
   <div class="footer">
     Kategoriler: Recht &middot; Makroökonomie &middot; Statistik &middot; Deutsch lernen<br>
-    Veriler doğrudan tarayıcınızdan <a href="https://clockify.me" target="_blank">Clockify API</a>'sine bağlanılarak çekilir.
+    Veriler doğrudan tarayıcınızdan <a href="https://clockify.me" target="_blank">Clockify API</a>'sine bağlanılarak çekilir. Sekmeye her geri döndüğünüzde otomatik yenilenir.
   </div>
 
 </div>
@@ -289,10 +294,12 @@ const CATEGORY_COLORS = {
 };
 const MA7_COLOR = "#ff375f";
 const MA30_COLOR = "#1d1d1f";
-const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
+const BACKGROUND_REFRESH_MS = 5 * 60 * 1000;
+const STALE_THRESHOLD_MS = 60 * 1000;
 let mainChart = null;
 let categoryChart = null;
 let refreshTimer = null;
+let lastLoadedAt = 0;
 
 function isDarkMode() {
   return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -656,12 +663,20 @@ async function loadDashboard(silent) {
     renderMainChart(labels, totalSeries, categorySeriesMap);
     renderCategoryChart(categoryTotals);
 
+    lastLoadedAt = Date.now();
     const now2 = new Date();
     setStatus("Son güncelleme: " + now2.toLocaleTimeString("tr-TR") + " · " + entries.length + " kayıt yüklendi.", "ok");
   } catch (err) {
     console.error(err);
     setStatus("Hata: " + err.message, "error");
   }
+}
+
+async function manualRefresh() {
+  const btn = document.getElementById("refreshBtn");
+  btn.classList.add("spinning");
+  await loadDashboard(true);
+  btn.classList.remove("spinning");
 }
 
 function saveAndLoad() {
@@ -674,23 +689,34 @@ function saveAndLoad() {
   localStorage.setItem("clockify_api_key", apiKey);
   if (workspaceId) localStorage.setItem("clockify_workspace_id", workspaceId);
   else localStorage.removeItem("clockify_workspace_id");
-  startAutoRefresh();
+  startBackgroundRefresh();
   loadDashboard(false);
 }
 
-function startAutoRefresh() {
+function startBackgroundRefresh() {
   if (refreshTimer) clearInterval(refreshTimer);
-  refreshTimer = setInterval(() => loadDashboard(true), REFRESH_INTERVAL_MS);
+  refreshTimer = setInterval(() => {
+    if (document.visibilityState === "visible") loadDashboard(true);
+  }, BACKGROUND_REFRESH_MS);
   document.getElementById("refreshInfo").textContent =
-    "Otomatik yenileme: " + (REFRESH_INTERVAL_MS / 60000) + " dk";
+    "Sekmeye dönünce ve her " + (BACKGROUND_REFRESH_MS / 60000) + " dk'da otomatik yenilenir";
 }
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    const { apiKey } = getSettings();
+    if (apiKey && Date.now() - lastLoadedAt > STALE_THRESHOLD_MS) {
+      loadDashboard(true);
+    }
+  }
+});
 
 window.addEventListener("load", () => {
   const { apiKey, workspaceId } = getSettings();
   if (apiKey) {
     document.getElementById("apiKey").value = apiKey;
     document.getElementById("workspaceId").value = workspaceId;
-    startAutoRefresh();
+    startBackgroundRefresh();
     loadDashboard(false);
   }
 });
